@@ -42,10 +42,17 @@ public class SortingVisualizer extends JComponent {
         float hDiff = (float) MAX_VALUE / BAR_COUNT;
         for (int i = 0; i < BAR_COUNT; i++) {
             switch (order) {
-                case -1 -> arr[i] = (int) (hDiff * (BAR_COUNT - i));
-                case 0 -> arr[i] = random.nextInt(MAX_VALUE) + 1;
-                case 1 -> arr[i] = (int) (hDiff * (i + 1));
-                default -> throw new IllegalArgumentException();
+                case -1:
+                    arr[i] = (int) (hDiff * (BAR_COUNT - i));
+                    break;
+                case 0:
+                    arr[i] = random.nextInt(MAX_VALUE) + 1;
+                    break;
+                case 1:
+                    arr[i] = (int) (hDiff * (i + 1));
+                    break;
+                default:
+                    throw new IllegalArgumentException();
             }
         }
         sorted = false;
@@ -85,5 +92,6 @@ public class SortingVisualizer extends JComponent {
             int barHeight = getHeight() * array[i] / MAX_VALUE;
             g.fillRect(PADDING / 2 + (barWidth + PADDING) * i, getHeight() - barHeight, barWidth, barHeight);
         }
+        Toolkit.getDefaultToolkit().sync();
     }
 }
