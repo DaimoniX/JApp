@@ -1,6 +1,9 @@
 package app.pages.vizualizer;
 
 import javax.swing.*;
+
+import app.pages.vizualizer.sorters.*;
+
 import java.awt.*;
 import java.util.Random;
 
@@ -12,6 +15,7 @@ public class Visualizer extends JComponent {
     private int[] selectedElements = null;
     private boolean sorted = false;
     private int order = -1;
+    private CycledSort sorter;
     
     private static final Color SELECTED_BAR_COLOR = Color.RED;
     private static final Color BAR_COLOR = Color.WHITE;
@@ -27,12 +31,15 @@ public class Visualizer extends JComponent {
 
     public Visualizer(int order) {
         super();
-        this.order = order;
         random = new Random();
-        array = createArray(order);
         timer = new Timer(50, e -> update());
-        selectedElements = new int[2];
-        sorted = false;
+        sorter = new BubbleSort();
+        reset(order);
+    }
+
+    public void setSorter(CycledSort sorter) {
+        this.sorter = sorter;
+        this.sorter.setArray(array);
     }
 
     public void start() {
@@ -52,7 +59,7 @@ public class Visualizer extends JComponent {
         this.order = order;
         array = createArray(order);
         sorted = false;
-        ind = ind1 = 0;
+        sorter.setArray(array);
         repaint();
     }
 
@@ -83,23 +90,9 @@ public class Visualizer extends JComponent {
         return arr;
     }
 
-    private int ind = 0;
-    private int ind1 = 0;
-
     private void update() {
-        if(array[ind1] > array[ind1 + 1]) {
-            Integer temp = array[ind1];
-            array[ind1] = array[ind1 + 1];
-            array[ind1 + 1] = temp;
-        }
-        ind1++;
-        if(ind1 >= array.length - 1) {
-            ind1 = 0;
-            ind++;
-        }
-        selectedElements[0] = ind1;
-        selectedElements[1] = ind1 + 1;
-        sorted = ind + 1 == array.length;
+        sorted = sorter.next();
+        selectedElements = sorter.getActiveIndexes();
         if(sorted)
             timer.stop();
         repaint();
@@ -109,9 +102,7 @@ public class Visualizer extends JComponent {
     protected void paintComponent(Graphics g) {
         int barWidth = (getWidth() - PADDING * array.length) / array.length;
         g.setColor(getBackground()); // r 64 g 64 b 64
-        g.fillRect(0, 0, getWidth(), getHeight());
-
-        
+        g.fillRect(0, 0, getWidth(), getHeight());     
 
         for (int i = 0; i < array.length; i++) {
             int barHeight = getHeight() * array[i] / MAX_VALUE;
